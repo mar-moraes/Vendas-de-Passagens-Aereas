@@ -3,6 +3,7 @@ import java.util.Locale;
 
 /**
  * Classe de modelo (POJO) que representa UMA reserva com todos os seus detalhes.
+ * (Sem alterações nesta classe)
  */
 public class Reserva {
 
@@ -53,8 +54,7 @@ public class Reserva {
         this.metodoPagamento = metodoPagamento;
     }
 
-    // --- Getters para todos os campos ---
-    // (Omitidos por brevidade para a explicação, mas estão abaixo)
+    // --- Getters ---
 
     public String getCodigo() {
         return codigo;
@@ -138,10 +138,10 @@ public class Reserva {
      * Retorna o HTML formatado para a coluna da tabela.
      */
     public String getOrigemDestinoHtml() {
-        return "<html>" + origem + "<br>" + destino + "</html>";
+        return "<html><body style='width: 150px;'>" + origem + "<br><b>" + destino + "</b></html>";
     }
 
-    // Métodos para permitir a alteração dos dados no modo de edição
+    // --- Setters (para o modo de edição) ---
 
     public void setNomePassageiro(String nomePassageiro) {
         this.nomePassageiro = nomePassageiro;

@@ -1,33 +1,153 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
- */
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import java.awt.*;
 
-import javax.swing.JOptionPane;
-/**
- *
- * @author eumes
- */
 public class tela_cadastro extends javax.swing.JPanel {
 
-    /**
-     * Creates new form tela_cadastro
-     */
+    // --- Constantes de Design ---
+    private static final Color COR_PRINCIPAL = new Color(0, 51, 153); // Azul do logo
+    private static final Color COR_DESTAQUE = new Color(255, 102, 0); // Laranja do logo
+    private static final Color COR_FUNDO_NOVO = new Color(44, 117, 204); // #4297f7
+    private static final Font FONTE_PADRAO = new Font("Arial", Font.PLAIN, 14);
+    // ----------------------------
+
     public tela_cadastro() {
         initComponents();
+        personalizarLayout();
+    }
+    
+    private void personalizarLayout() {
+        // Define o layout principal do *este* JPanel como BorderLayout
+        this.setLayout(new BorderLayout());
+        this.setBackground(COR_FUNDO_NOVO); // <<< CORREÇÃO
+
+        // --- PAINEL DO LOGO (TOPO) ---
+        JPanel painelLogo = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        painelLogo.setBackground(COR_FUNDO_NOVO); // <<< CORREÇÃO
+        painelLogo.setBorder(new EmptyBorder(40, 20, 20, 20));
+
+        ImageIcon logoIcon = new ImageIcon(getClass().getResource("logo.png"));
+        JLabel lblLogo = new JLabel();
+        if (logoIcon.getImage() != null) {
+            Image img = logoIcon.getImage().getScaledInstance(-1, 80, Image.SCALE_SMOOTH); 
+            lblLogo.setIcon(new ImageIcon(img));
+        } else {
+            lblLogo.setText("Logo App");
+            lblLogo.setFont(new Font("Arial", Font.BOLD, 24));
+            lblLogo.setForeground(Color.WHITE); // <<< CORREÇÃO
+        }
+        painelLogo.add(lblLogo);
+        
+        // Adiciona o painel do logo ao TOPO
+        this.add(painelLogo, BorderLayout.NORTH);
+
+        // --- PAINEL DO FORMULÁRIO (CENTRO) ---
+        // (jPanel1 foi renomeado para painelFormulario no código gerado)
+        
+        // Remove o layout absoluto
+        painelFormulario.setLayout(new GridBagLayout()); 
+        painelFormulario.setBackground(COR_FUNDO_NOVO); // <<< CORREÇÃO
+        painelFormulario.setBorder(new EmptyBorder(20, 50, 50, 50));
+        
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0;
+        
+        // Título
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2; // Ocupa 2 colunas
+        gbc.anchor = GridBagConstraints.CENTER;
+        jLabel1.setFont(new Font("Arial", Font.BOLD, 24));
+        jLabel1.setForeground(Color.WHITE); // <<< CORREÇÃO
+        painelFormulario.add(jLabel1, gbc);
+
+        // --- Labels e Campos ---
+        gbc.gridwidth = 1;
+        gbc.anchor = GridBagConstraints.LINE_END; // Alinha labels à direita
+
+        // Nome
+        gbc.gridx = 0; gbc.gridy = 1;
+        jLabel2.setFont(new Font("Arial", Font.BOLD, 14));
+        jLabel2.setForeground(Color.WHITE); // <<< CORREÇÃO
+        painelFormulario.add(jLabel2, gbc);
+        gbc.gridx = 1; gbc.gridy = 1;
+        gbc.anchor = GridBagConstraints.LINE_START; // Campos à esquerda
+        campoNome.setFont(FONTE_PADRAO);
+        painelFormulario.add(campoNome, gbc);
+        
+        // E-mail
+        gbc.gridx = 0; gbc.gridy = 2;
+        gbc.anchor = GridBagConstraints.LINE_END;
+        jLabel3.setFont(new Font("Arial", Font.BOLD, 14));
+        jLabel3.setForeground(Color.WHITE); // <<< CORREÇÃO
+        painelFormulario.add(jLabel3, gbc);
+        gbc.gridx = 1; gbc.gridy = 2;
+        gbc.anchor = GridBagConstraints.LINE_START;
+        campoEmail.setFont(FONTE_PADRAO);
+        painelFormulario.add(campoEmail, gbc);
+
+        // Telefone
+        gbc.gridx = 0; gbc.gridy = 3;
+        gbc.anchor = GridBagConstraints.LINE_END;
+        jLabel6.setFont(new Font("Arial", Font.BOLD, 14));
+        jLabel6.setForeground(Color.WHITE); // <<< CORREÇÃO
+        painelFormulario.add(jLabel6, gbc);
+        gbc.gridx = 1; gbc.gridy = 3;
+        gbc.anchor = GridBagConstraints.LINE_START;
+        campoTelefone.setFont(FONTE_PADRAO);
+        painelFormulario.add(campoTelefone, gbc);
+
+        // Senha
+        gbc.gridx = 0; gbc.gridy = 4;
+        gbc.anchor = GridBagConstraints.LINE_END;
+        jLabel4.setFont(new Font("Arial", Font.BOLD, 14));
+        jLabel4.setForeground(Color.WHITE); // <<< CORREÇÃO
+        painelFormulario.add(jLabel4, gbc);
+        gbc.gridx = 1; gbc.gridy = 4;
+        gbc.anchor = GridBagConstraints.LINE_START;
+        campoSenha.setFont(FONTE_PADRAO);
+        painelFormulario.add(campoSenha, gbc);
+
+        // Confirmar Senha
+        gbc.gridx = 0; gbc.gridy = 5;
+        gbc.anchor = GridBagConstraints.LINE_END;
+        jLabel5.setFont(new Font("Arial", Font.BOLD, 14));
+        jLabel5.setForeground(Color.WHITE); // <<< CORREÇÃO
+        painelFormulario.add(jLabel5, gbc);
+        gbc.gridx = 1; gbc.gridy = 5;
+        gbc.anchor = GridBagConstraints.LINE_START;
+        campoConfirmarSenha.setFont(FONTE_PADRAO);
+        painelFormulario.add(campoConfirmarSenha, gbc);
+
+        // Botão Cadastrar
+        gbc.gridx = 0; gbc.gridy = 6;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.insets = new Insets(20, 5, 5, 5);
+        b_cadastro.setFont(new Font("Arial", Font.BOLD, 16));
+        b_cadastro.setBackground(COR_DESTAQUE);
+        b_cadastro.setForeground(Color.WHITE);
+        b_cadastro.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        b_cadastro.setPreferredSize(new Dimension(200, 40));
+        painelFormulario.add(b_cadastro, gbc);
+
+        // Link Voltar
+        gbc.gridy = 7;
+        lblLinkVoltar.setForeground(Color.WHITE); // <<< CORREÇÃO
+        painelFormulario.add(lblLinkVoltar, gbc);
+
+        // Adiciona o painel do formulário ao CENTRO
+        this.add(painelFormulario, BorderLayout.CENTER);
     }
 
-    /**
-     * This method is called from within the constructor to initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is always
-     * regenerated by the Form Editor.
-     */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
     private void initComponents() {
 
         jPanel2 = new javax.swing.JPanel();
-        jPanel1 = new javax.swing.JPanel();
+        painelFormulario = new javax.swing.JPanel(); // Renomeado
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
@@ -40,6 +160,7 @@ public class tela_cadastro extends javax.swing.JPanel {
         campoEmail = new javax.swing.JTextField();
         campoTelefone = new javax.swing.JTextField();
         b_cadastro = new javax.swing.JButton();
+        lblLinkVoltar = new javax.swing.JLabel(); // NOVO LINK
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -52,59 +173,84 @@ public class tela_cadastro extends javax.swing.JPanel {
             .addGap(0, 100, Short.MAX_VALUE)
         );
 
+        // O layout deste painel será redefinido em personalizarLayout()
+        painelFormulario.setLayout(null); 
+
         jLabel1.setFont(new java.awt.Font("Arial", 0, 24)); // NOI18N
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("Crie sua conta ");
+        painelFormulario.add(jLabel1);
+        jLabel1.setBounds(151, 18, 189, 54); // Coords originais
 
         jLabel2.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel2.setText("Nome");
+        painelFormulario.add(jLabel2);
+        jLabel2.setBounds(114, 99, 105, 17); // Coords originais
 
         jLabel3.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel3.setText("E-mail");
+        painelFormulario.add(jLabel3);
+        jLabel3.setBounds(114, 139, 105, 17); // Coords originais
 
         jLabel4.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel4.setText("Senha");
+        painelFormulario.add(jLabel4);
+        jLabel4.setBounds(114, 219, 105, 17); // Coords originais
 
         jLabel5.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel5.setText("Confirmar senha");
+        painelFormulario.add(jLabel5);
+        jLabel5.setBounds(114, 259, 105, 17); // Coords originais
 
         jLabel6.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel6.setText("Telefone");
+        painelFormulario.add(jLabel6);
+        jLabel6.setBounds(114, 179, 105, 17); // Coords originais
 
         campoConfirmarSenha.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 campoConfirmarSenhaActionPerformed(evt);
             }
         });
+        painelFormulario.add(campoConfirmarSenha);
+        campoConfirmarSenha.setBounds(225, 259, 168, 22); // Coords originais
 
         campoSenha.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 campoSenhaActionPerformed(evt);
             }
         });
+        painelFormulario.add(campoSenha);
+        campoSenha.setBounds(225, 219, 168, 22); // Coords originais
 
         campoNome.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 campoNomeActionPerformed(evt);
             }
         });
+        painelFormulario.add(campoNome);
+        campoNome.setBounds(225, 99, 168, 22); // Coords originais
 
         campoEmail.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 campoEmailActionPerformed(evt);
             }
         });
+        painelFormulario.add(campoEmail);
+        campoEmail.setBounds(225, 139, 168, 22); // Coords originais
 
         campoTelefone.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 campoTelefoneActionPerformed(evt);
             }
         });
+        painelFormulario.add(campoTelefone);
+        campoTelefone.setBounds(225, 179, 168, 22); // Coords originais
 
         b_cadastro.setFont(new java.awt.Font("Arial", 0, 18)); // NOI18N
         b_cadastro.setText("Cadastrar");
@@ -113,169 +259,108 @@ public class tela_cadastro extends javax.swing.JPanel {
                 b_cadastroActionPerformed(evt);
             }
         });
+        painelFormulario.add(b_cadastro);
+        b_cadastro.setBounds(114, 311, 296, 34); // Coords originais
+        
+        // --- NOVO LINK PARA VOLTAR ---
+        lblLinkVoltar.setText("<html><a href=\"#\">Voltar para o Login</a></html>");
+        lblLinkVoltar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        lblLinkVoltar.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblLinkVoltar.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lblLinkVoltarMouseClicked(evt);
+            }
+        });
+        // Adiciona ao painel (coordenadas serão ignoradas)
+        painelFormulario.add(lblLinkVoltar);
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap(114, Short.MAX_VALUE)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(b_cadastro, javax.swing.GroupLayout.PREFERRED_SIZE, 296, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(campoConfirmarSenha)
-                                    .addComponent(campoSenha)
-                                    .addComponent(campoNome)
-                                    .addComponent(campoEmail)
-                                    .addComponent(campoTelefone, javax.swing.GroupLayout.PREFERRED_SIZE, 168, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                        .addGap(92, 92, 92))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 189, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(137, 137, 137))))
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(18, 18, 18)
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(27, 27, 27)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(campoNome, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel3)
-                    .addComponent(campoEmail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel6)
-                    .addComponent(campoTelefone, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel4)
-                    .addComponent(campoSenha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel5)
-                    .addComponent(campoConfirmarSenha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(30, 30, 30)
-                .addComponent(b_cadastro, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(56, Short.MAX_VALUE))
-        );
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
+        // Adiciona o painel (que será movido para o CENTRO em personalizarLayout())
+        add(painelFormulario);
+        painelFormulario.setBounds(0, 0, 502, 401); // Coords originais
     }// </editor-fold>                        
-// </editor-fold>                        
-// </editor-fold>                        
-// </editor-fold>                        
-
 
     private void campoSenhaActionPerformed(java.awt.event.ActionEvent evt) {                                           
-        // TODO add your handling code here:
         campoConfirmarSenha.requestFocus();
-        
     }                                          
 
     private void campoConfirmarSenhaActionPerformed(java.awt.event.ActionEvent evt) {                                                    
-        // TODO add your handling code here:
         b_cadastroActionPerformed(evt);
     }                                                   
 
     private void campoNomeActionPerformed(java.awt.event.ActionEvent evt) {                                          
-        // TODO add your handling code here:
         campoEmail.requestFocus();
     }                                         
 
     private void campoEmailActionPerformed(java.awt.event.ActionEvent evt) {                                           
-        // TODO add your handling code here:
         campoTelefone.requestFocus();
     }                                          
 
     private void campoTelefoneActionPerformed(java.awt.event.ActionEvent evt) {                                              
-        // TODO add your handling code here:
         campoSenha.requestFocus();
     }                                             
 
     private void b_cadastroActionPerformed(java.awt.event.ActionEvent evt) {                                           
-        // TODO add your handling code here:
-        // --- LÓGICA DE CADASTRO ---
-
-        // 1. Obter os dados dos campos
         String nome = campoNome.getText();
         String email = campoEmail.getText();
         String telefone = campoTelefone.getText();
-        
-        // Forma correta de pegar senhas
         char[] senha = campoSenha.getPassword();
         char[] confirmarSenha = campoConfirmarSenha.getPassword();
 
-        // 2. Validar se os campos estão preenchidos
         if (nome.isEmpty() || email.isEmpty() || telefone.isEmpty() || senha.length == 0 || confirmarSenha.length == 0) {
-            JOptionPane.showMessageDialog(this, "Por favor, preencha todos os campos.");
-            return; // Para a execução se houver erro
+            JOptionPane.showMessageDialog(this, "Por favor, preencha todos os campos.", "Erro", JOptionPane.WARNING_MESSAGE);
+            return; 
         }
 
-        // 3. Validar se as senhas são iguais
         if (!java.util.Arrays.equals(senha, confirmarSenha)) {
-            JOptionPane.showMessageDialog(this, "As senhas não coincidem. Tente novamente.");
-            // Limpa os campos de senha para o usuário digitar de novo
+            JOptionPane.showMessageDialog(this, "As senhas não coincidem. Tente novamente.", "Erro", JOptionPane.WARNING_MESSAGE);
             campoSenha.setText("");
             campoConfirmarSenha.setText("");
-            return; // Para a execução
+            return; 
         }
 
-        // 4. Se tudo estiver certo, mostrar sucesso
-        // (Aqui entraria a lógica de salvar no Banco de Dados)
-        JOptionPane.showMessageDialog(this, "Cadastro realizado com sucesso!");
+        JOptionPane.showMessageDialog(this, "Cadastro realizado com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
 
-        // 5. Limpar os campos após o cadastro
+        // Limpa os campos
         campoNome.setText("");
         campoEmail.setText("");
         campoTelefone.setText("");
         campoSenha.setText("");
         campoConfirmarSenha.setText("");
 
-        // 6. (Boa prática) Limpar os arrays de senha da memória
         java.util.Arrays.fill(senha, ' ');
-        java.util.Arrays.fill(confirmarSenha, ' ');        
+        java.util.Arrays.fill(confirmarSenha, ' ');  
+
+        // Volta para a tela de login
+        lblLinkVoltarMouseClicked(null);
     }                                          
+
+    /**
+     * Ação do novo link "Voltar"
+     */
+    private void lblLinkVoltarMouseClicked(java.awt.event.MouseEvent evt) {
+        // Encontra o JFrame "pai" deste JPanel
+        Window janela = SwingUtilities.getWindowAncestor(this);
+        
+        // Cria a nova tela de login
+        tela_login telaLogin = new tela_login();
+        telaLogin.setVisible(true);
+        
+        // Fecha a janela atual (que contém o painel de cadastro)
+        if (janela != null) {
+            janela.dispose();
+        }
+    }
     
     public static void main(String args[]) {
-        /* Cria uma janela (JFrame) para teste */
-        javax.swing.JFrame frameDeTeste = new javax.swing.JFrame();
-        
-        // Define o que acontece ao fechar a janela
+        javax.swing.JFrame frameDeTeste = new javax.swing.JFrame("Teste Cadastro");
         frameDeTeste.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
         
-        // Adiciona o SEU painel (esta classe) dentro da janela
+        // Adiciona o painel de cadastro
         frameDeTeste.add(new tela_cadastro());
         
-        // Ajusta o tamanho da janela automaticamente ao tamanho do painel
         frameDeTeste.pack();
-        
-        // Centraliza a janela na tela
+        frameDeTeste.setSize(550, 700); // Define um tamanho razoável
         frameDeTeste.setLocationRelativeTo(null);
-        
-        // Torna a janela visível
         frameDeTeste.setVisible(true);
     }
 
@@ -292,9 +377,8 @@ public class tela_cadastro extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel painelFormulario; // Renomeado
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JLabel lblLinkVoltar; // NOVO
     // End of variables declaration                   
 }
-
-

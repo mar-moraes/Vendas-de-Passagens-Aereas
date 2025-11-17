@@ -6,16 +6,11 @@ import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.File;
 
-/**
- * Um JDialog modal que exibe os detalhes completos de uma Reserva.
- * --- CLASSE ATUALIZADA ---
- * (Agora gerencia "Modo Leitura" e "Modo Edição" e sinaliza exclusão)
- */
 public class tela_detalhes_reserva extends JDialog {
 
     private Reserva reserva;
     
-    // --- Campos para Modo de Edição ---
+    // Campos para Edição
     private JLabel lblNomeValor;
     private JLabel lblDocumentoValor;
     private JLabel lblAssentoValor;
@@ -28,29 +23,37 @@ public class tela_detalhes_reserva extends JDialog {
     private JPanel painelBotoesLeitura;
     private JPanel painelBotoesEdicao;
     
-    // --- NOVO CAMPO PARA SINALIZAR EXCLUSÃO ---
     private boolean solicitouExclusao = false;
-    // ------------------------------------------
+
+    // --- Cores Padronizadas ---
+    private Color corPrincipal;
+    private Color corDestaque;
+    private static final Font FONTE_PADRAO = new Font("Arial", Font.PLAIN, 14);
+    private static final Font FONTE_LABEL = new Font("Arial", Font.BOLD, 14);
 
     /**
-     * Construtor da tela de detalhes.
-     * @param owner O Frame pai (a tela principal)
-     * @param reserva O objeto Reserva com todos os dados a serem exibidos.
+     * Construtor atualizado para receber as cores.
      */
-    public tela_detalhes_reserva(Frame owner, Reserva reserva) {
+    public tela_detalhes_reserva(Frame owner, Reserva reserva, Color corPrincipal, Color corDestaque) {
         super(owner, "Detalhes da Reserva: " + reserva.getCodigo(), true); 
         this.reserva = reserva;
+        this.corPrincipal = (corPrincipal != null) ? corPrincipal : new Color(0, 51, 153);
+        this.corDestaque = (corDestaque != null) ? corDestaque : new Color(255, 102, 0);
         
-        setSize(700, 600);
+        setSize(700, 650); // Aumentei a altura
         setLayout(new BorderLayout(10, 10));
         setLocationRelativeTo(owner); 
+        getContentPane().setBackground(Color.WHITE);
 
         JPanel painelConteudo = new JPanel(new BorderLayout(10, 10));
         painelConteudo.setBorder(new EmptyBorder(15, 15, 15, 15));
+        painelConteudo.setBackground(Color.WHITE);
 
         // 1. Painel de Detalhes (Centro)
         JPanel painelDetalhes = new JPanel();
         painelDetalhes.setLayout(new BoxLayout(painelDetalhes, BoxLayout.Y_AXIS));
+        painelDetalhes.setBackground(Color.WHITE);
+        
         painelDetalhes.add(criarSecaoVoo());
         painelDetalhes.add(Box.createRigidArea(new Dimension(0, 15))); 
         painelDetalhes.add(criarSecaoPassageiro()); 
@@ -59,6 +62,9 @@ public class tela_detalhes_reserva extends JDialog {
         
         JScrollPane scrollPane = new JScrollPane(painelDetalhes);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        scrollPane.setBackground(Color.WHITE);
+        scrollPane.getViewport().setBackground(Color.WHITE);
+        
         painelConteudo.add(scrollPane, BorderLayout.CENTER);
 
         // 2. Painel de Ações (Sul)
@@ -69,78 +75,70 @@ public class tela_detalhes_reserva extends JDialog {
         alternarModoEdicao(false);
     }
     
-    // --- NOVO MÉTODO GETTER ---
-    /**
-     * Usado pela tela_reserva para verificar se a exclusão foi confirmada.
-     * @return true se o usuário confirmou a exclusão, false caso contrário.
-     */
+    // Construtor de fallback (caso as cores não sejam passadas)
+    public tela_detalhes_reserva(Frame owner, Reserva reserva) {
+        this(owner, reserva, null, null);
+    }
+
     public boolean foiExclusaoSolicitada() {
         return this.solicitouExclusao;
     }
-    // --------------------------
 
     /**
-     * Cria um painel de seção com um Título e GridBagLayout
+     * Cria um painel de seção com Título e GridBagLayout
      */
     private JPanel criarPainelSecao(String titulo) {
         JPanel painel = new JPanel(new GridBagLayout());
+        painel.setBackground(Color.WHITE);
         painel.setBorder(BorderFactory.createTitledBorder(
-                BorderFactory.createEtchedBorder(), 
+                BorderFactory.createLineBorder(Color.LIGHT_GRAY), 
                 titulo, 
                 TitledBorder.LEFT, 
                 TitledBorder.TOP, 
-                new Font("SansSerif", Font.BOLD, 14), 
-                Color.BLACK));
+                new Font("Arial", Font.BOLD, 16), 
+                corPrincipal)); // Usa a cor principal no título
         return painel;
     }
 
-    /**
-     * Adiciona um par (Label, Valor) a um painel com GridBagLayout
-     * @param valorComponent O Componente de valor (pode ser um JLabel ou JPanel com CardLayout)
-     */
     private void adicionarDetalhe(JPanel painel, String label, Component valorComponent, int y) {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.anchor = GridBagConstraints.WEST;
 
-        // Label (Negrito)
+        // Label
         gbc.gridx = 0;
         gbc.gridy = y;
-        gbc.weightx = 0.1; 
-        JLabel lbl = new JLabel("<html><b>" + label + "</b></html>");
-        lbl.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        gbc.weightx = 0.3; // Mais espaço para o label
+        JLabel lbl = new JLabel(label);
+        lbl.setFont(FONTE_LABEL);
         painel.add(lbl, gbc);
 
-        // Componente de Valor (JLabel, JTextField, etc.)
+        // Componente de Valor
         gbc.gridx = 1;
         gbc.gridy = y;
-        gbc.weightx = 0.9; 
+        gbc.weightx = 0.7; 
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        valorComponent.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        valorComponent.setFont(FONTE_PADRAO);
         painel.add(valorComponent, gbc);
     }
     
-    /**
-     * Helper para criar um JLabel de valor simples (não-editável)
-     */
     private JLabel criarLabelValor(String texto) {
         JLabel val = new JLabel(texto);
-        val.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        val.setFont(FONTE_PADRAO);
         return val;
     }
 
-    /**
-     * Helper para criar um painel "Card" que troca entre JLabel e JTextField
-     * @param textoInicial O texto do JLabel e do JTextField
-     * @return O JPanel com CardLayout
-     */
     private JPanel criarCampoEditavel(String textoInicial, String tipo) {
-        // 1. Cria os componentes
         JLabel label = new JLabel(textoInicial);
+        label.setFont(FONTE_PADRAO);
+        
         JTextField textField = new JTextField(textoInicial);
-        textField.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        textField.setFont(FONTE_PADRAO);
+        textField.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(corPrincipal),
+            new EmptyBorder(3, 3, 3, 3)
+        ));
 
-        // 2. Armazena as referências nos campos da classe
         if ("nome".equals(tipo)) {
             lblNomeValor = label;
             txtNome = textField;
@@ -152,12 +150,11 @@ public class tela_detalhes_reserva extends JDialog {
             txtAssento = textField;
         }
 
-        // 3. Cria o painel com CardLayout
         JPanel cardPanel = new JPanel(new CardLayout());
-        cardPanel.add(label, "LEITURA"); // Card 1
-        cardPanel.add(textField, "EDICAO"); // Card 2
+        cardPanel.setBackground(Color.WHITE);
+        cardPanel.add(label, "LEITURA");
+        cardPanel.add(textField, "EDICAO");
         
-        // 4. Armazena o painel para o método 'alternarModoEdicao'
         if ("nome".equals(tipo)) cardPanelNome = cardPanel;
         else if ("documento".equals(tipo)) cardPanelDocumento = cardPanel;
         else if ("assento".equals(tipo)) cardPanelAssento = cardPanel;
@@ -166,9 +163,6 @@ public class tela_detalhes_reserva extends JDialog {
     }
 
 
-    /**
-     * Cria a seção com detalhes do Voo (Não-editável)
-     */
     private JPanel criarSecaoVoo() {
         JPanel painel = criarPainelSecao("Detalhes do Voo");
 
@@ -182,9 +176,6 @@ public class tela_detalhes_reserva extends JDialog {
         return painel;
     }
 
-    /**
-     * Cria a seção com detalhes do Passageiro (Agora com campos editáveis)
-     */
     private JPanel criarSecaoPassageiro() {
         JPanel painel = criarPainelSecao("Passageiro");
 
@@ -195,9 +186,6 @@ public class tela_detalhes_reserva extends JDialog {
         return painel;
     }
 
-    /**
-     * Cria a seção com detalhes do Pagamento (Não-editável)
-     */
     private JPanel criarSecaoPagamento() {
         JPanel painel = criarPainelSecao("Pagamento");
 
@@ -208,85 +196,115 @@ public class tela_detalhes_reserva extends JDialog {
         return painel;
     }
     
-    /**
-     * Ação de clique unificada para os botões "Remover Reserva".
-     * Pergunta, define a flag e fecha a janela.
-     */
     private void acaoRemoverReserva() {
         int confirm = JOptionPane.showConfirmDialog(
-            tela_detalhes_reserva.this, // o "this" é o JDialog
+            tela_detalhes_reserva.this, 
             "Tem certeza que deseja cancelar a reserva selecionada?",
             "Confirmar Cancelamento",
-            JOptionPane.YES_NO_OPTION
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.WARNING_MESSAGE
         );
     
         if (confirm == JOptionPane.YES_OPTION) {
-            // 1. Avisar a tela_reserva que a exclusão foi confirmada
             this.solicitouExclusao = true;
-            // 2. Fechar a tela de detalhes (como pedido)
             this.dispose(); 
         }
     }
 
     /**
-     * Cria o painel inferior com botões contextuais (Leitura e Edição)
-     * --- MÉTODO ATUALIZADO ---
+     * Aplica o estilo de botão principal (cor de destaque).
      */
+    private void estilizarBotaoPrincipal(JButton botao) {
+        botao.setBackground(corDestaque);
+        botao.setForeground(Color.WHITE);
+        botao.setFont(new Font("Arial", Font.BOLD, 12));
+        botao.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        botao.setFocusPainted(false);
+    }
+    
+    /**
+     * Aplica o estilo de botão secundário (discreto).
+     */
+    private void estilizarBotaoSecundario(JButton botao) {
+        botao.setBackground(Color.WHITE);
+        botao.setForeground(new Color(100, 100, 100));
+        botao.setFont(new Font("Arial", Font.PLAIN, 12));
+        botao.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        botao.setFocusPainted(false);
+        botao.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+    }
+
     private JPanel criarSecaoAcoes() {
         JPanel painelAcoes = new JPanel(new BorderLayout());
+        painelAcoes.setBackground(Color.WHITE);
+        painelAcoes.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY));
+        painelAcoes.setBorder(new EmptyBorder(10, 0, 0, 0));
         
         // --- Painel 1: Botões do Modo Leitura ---
         painelBotoesLeitura = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
+        painelBotoesLeitura.setBackground(Color.WHITE);
         
-        // Lógica de ações contextuais
         if ("Confirmada".equals(reserva.getStatus())) {
             JButton btnAlterar = new JButton("🔄 Alterar Reserva");
+            estilizarBotaoPrincipal(btnAlterar);
             btnAlterar.addActionListener(e -> alternarModoEdicao(true));
             painelBotoesLeitura.add(btnAlterar);
             
-            // Botão Remover (Confirmada)
             JButton btnRemoverConfirmada = new JButton("❌ Remover Reserva");
-            btnRemoverConfirmada.addActionListener(e -> acaoRemoverReserva()); // LÓGICA ATUALIZADA
+            estilizarBotaoSecundario(btnRemoverConfirmada);
+            btnRemoverConfirmada.addActionListener(e -> acaoRemoverReserva());
             painelBotoesLeitura.add(btnRemoverConfirmada);
             
             JButton btnComprovante = new JButton("📄 Gerar Comprovante");
+            estilizarBotaoSecundario(btnComprovante);
             btnComprovante.addActionListener(e -> simularGerarPDF());
             painelBotoesLeitura.add(btnComprovante);
             
         } else if ("Pendente".equals(reserva.getStatus())) {
-            painelBotoesLeitura.add(new JButton("Efetuar Pagamento"));
+            JButton btnPagar = new JButton("Efetuar Pagamento");
+            estilizarBotaoPrincipal(btnPagar);
+            // Adicionar ação para abrir tela de pagamento
+            painelBotoesLeitura.add(btnPagar);
             
-            // Botão Remover (Pendente)
             JButton btnRemoverPendente = new JButton("❌ Remover Reserva");
-            btnRemoverPendente.addActionListener(e -> acaoRemoverReserva()); // LÓGICA ATUALIZADA
+            estilizarBotaoSecundario(btnRemoverPendente);
+            btnRemoverPendente.addActionListener(e -> acaoRemoverReserva());
             painelBotoesLeitura.add(btnRemoverPendente);
             
         } else {
-            painelBotoesLeitura.add(new JLabel("Reserva cancelada."));
+            JLabel lblCancelada = new JLabel("Reserva cancelada.");
+            lblCancelada.setFont(new Font("Arial", Font.ITALIC, 14));
+            lblCancelada.setForeground(Color.RED);
+            painelBotoesLeitura.add(lblCancelada);
         }
         
         // --- Painel 2: Botões do Modo Edição ---
         painelBotoesEdicao = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
+        painelBotoesEdicao.setBackground(Color.WHITE);
         
         JButton btnSalvar = new JButton("✅ Salvar Alterações");
+        estilizarBotaoPrincipal(btnSalvar);
+        btnSalvar.setBackground(new Color(0, 120, 0)); // Verde para salvar
         btnSalvar.addActionListener(e -> salvarAlteracoes());
         painelBotoesEdicao.add(btnSalvar);
         
         JButton btnCancelar = new JButton("❌ Cancelar Edição");
+        estilizarBotaoSecundario(btnCancelar);
         btnCancelar.addActionListener(e -> cancelarEdicao());
         painelBotoesEdicao.add(btnCancelar);
 
         
-        // Adiciona os dois painéis (um ficará invisível)
         JPanel painelAcoesEsquerda = new JPanel();
+        painelAcoesEsquerda.setBackground(Color.WHITE);
         painelAcoesEsquerda.add(painelBotoesLeitura);
         painelAcoesEsquerda.add(painelBotoesEdicao);
         
         // --- Botão Voltar (Sempre visível) ---
         JPanel painelVoltar = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 5));
+        painelVoltar.setBackground(Color.WHITE);
         JButton btnVoltar = new JButton("Voltar");
+        estilizarBotaoSecundario(btnVoltar);
         btnVoltar.addActionListener(e -> {
-            // Se estiver editando, pergunta antes de sair
             if (painelBotoesEdicao.isVisible()) {
                 int confirm = JOptionPane.showConfirmDialog(
                     this, 
@@ -295,10 +313,9 @@ public class tela_detalhes_reserva extends JDialog {
                     JOptionPane.YES_NO_OPTION
                 );
                 if (confirm == JOptionPane.NO_OPTION) {
-                    return; // Não faz nada
+                    return; 
                 }
             }
-            // Fecha o JDialog
             this.dispose();
         });
         painelVoltar.add(btnVoltar);
@@ -311,10 +328,6 @@ public class tela_detalhes_reserva extends JDialog {
     
     // --- MÉTODOS DE AÇÃO ---
 
-    /**
-     * Alterna a visibilidade dos componentes entre Leitura e Edição
-     * @param modoEdicao true para modo de edição, false para modo de leitura
-     */
     private void alternarModoEdicao(boolean modoEdicao) {
         CardLayout clNome = (CardLayout) cardPanelNome.getLayout();
         CardLayout clDoc = (CardLayout) cardPanelDocumento.getLayout();
@@ -337,13 +350,15 @@ public class tela_detalhes_reserva extends JDialog {
         }
     }
     
-    /**
-     * Ação do botão "Salvar Alterações"
-     */
     private void salvarAlteracoes() {
         String novoNome = txtNome.getText();
         String novoDoc = txtDocumento.getText();
         String novoAssento = txtAssento.getText();
+        
+        if (novoNome.isEmpty() || novoDoc.isEmpty() || novoAssento.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Por favor, preencha todos os campos.", "Erro", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
         
         reserva.setNomePassageiro(novoNome);
         reserva.setDocumentoPassageiro(novoDoc);
@@ -358,10 +373,8 @@ public class tela_detalhes_reserva extends JDialog {
         JOptionPane.showMessageDialog(this, "Alterações salvas com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
     }
     
-    /**
-     * Ação do botão "Cancelar Edição"
-     */
     private void cancelarEdicao() {
+        // Restaura os valores originais
         txtNome.setText(reserva.getNomePassageiro());
         txtDocumento.setText(reserva.getDocumentoPassageiro());
         txtAssento.setText(reserva.getAssento());
@@ -369,13 +382,10 @@ public class tela_detalhes_reserva extends JDialog {
         alternarModoEdicao(false);
     }
     
-    /**
-     * Simula a geração de PDF (ação do botão)
-     */
     private void simularGerarPDF() {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Salvar Comprovante PDF");
-        fileChooser.setSelectedFile(new File("Reserva_" + reserva.getCodigo() + ".pdf"));
+        fileChooser.setSelectedFile(new File("Reserva_" + reserva.getCodigo().replace("#", "") + ".pdf"));
         fileChooser.setFileFilter(new FileNameExtensionFilter("Arquivos PDF (*.pdf)", "pdf"));
 
         int userSelection = fileChooser.showSaveDialog(tela_detalhes_reserva.this);
