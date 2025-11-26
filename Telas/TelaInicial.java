@@ -7,19 +7,17 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.ParseException;
-import java.util.List; // --- NOVA FUNCIONALIDADE ---
+import java.util.List;
 
 public class TelaInicial extends JFrame {
 
     private JButton btnMinhasReservas, btnLogin, btnBuscarVoos;
     private JTextField txtOrigem, txtDestino;
     private JFormattedTextField txtData;
-    private JLabel lblPromocao, lblNovosDestinos;
 
     // --- Constantes de Design ---
     private static final Color COR_PRINCIPAL = new Color(0, 51, 153);
     private static final Color COR_DESTAQUE = new Color(255, 102, 0);
-    private static final Color COR_BACKGROUND = new Color(245, 245, 245);
     private static final Font FONTE_TITULO = new Font("Arial", Font.BOLD, 24);
     private static final Font FONTE_PADRAO = new Font("Arial", Font.PLAIN, 14);
     // ----------------------------
@@ -36,10 +34,9 @@ public class TelaInicial extends JFrame {
         add(criarHeaderPadrao(), BorderLayout.NORTH);
 
         // ======== CENTRO (Formulário de Busca e Cards) =========
-        // --- ALTERAÇÃO: O painel central agora usa JScrollPane ---
         JPanel centroContainer = new JPanel(new BorderLayout());
         centroContainer.setBackground(Color.WHITE);
-        
+
         JPanel centroPanel = new JPanel();
         centroPanel.setLayout(new BoxLayout(centroPanel, BoxLayout.Y_AXIS));
         centroPanel.setBorder(new EmptyBorder(40, 50, 40, 50));
@@ -58,30 +55,29 @@ public class TelaInicial extends JFrame {
 
         painelCampos.add(criarLabelCampo("Origem:"));
         txtOrigem = criarTextFieldCampo(20);
-        painelCampos.add(wrapTextField(txtOrigem)); 
+        painelCampos.add(wrapTextField(txtOrigem));
 
         painelCampos.add(criarLabelCampo("Destino:"));
         txtDestino = criarTextFieldCampo(20);
-        painelCampos.add(wrapTextField(txtDestino)); 
+        painelCampos.add(wrapTextField(txtDestino));
 
         painelCampos.add(criarLabelCampo("Datas (Ida e Volta):"));
-        
+
         try {
             MaskFormatter mascaraData = new MaskFormatter("##/##/#### - ##/##/####");
             mascaraData.setPlaceholderCharacter('_');
             txtData = new JFormattedTextField(mascaraData);
             txtData.setFont(FONTE_PADRAO);
             txtData.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(Color.GRAY),
-                new EmptyBorder(5, 5, 5, 5)
-            ));
+                    BorderFactory.createLineBorder(Color.GRAY),
+                    new EmptyBorder(5, 5, 5, 5)));
             txtData.setColumns(20);
         } catch (ParseException e) {
             e.printStackTrace();
             txtData = new JFormattedTextField();
             txtData.setColumns(20);
         }
-        painelCampos.add(wrapTextField(txtData)); 
+        painelCampos.add(wrapTextField(txtData));
 
         centroPanel.add(painelCampos);
         centroPanel.add(Box.createVerticalStrut(30));
@@ -98,33 +94,17 @@ public class TelaInicial extends JFrame {
         btnBuscarVoos.setMaximumSize(new Dimension(200, 40));
         centroPanel.add(btnBuscarVoos);
 
-        // --- NOVA FUNCIONALIDADE: Painel de Cards de Voos ---
+        // --- Painel de Cards de Voos ---
         centroPanel.add(Box.createVerticalStrut(30));
         centroPanel.add(criarPainelVoosDestaque());
         // ----------------------------------------------------
 
-        // --- ALTERAÇÃO: Adiciona o centroPanel a um JScrollPane ---
         JScrollPane scrollCentro = new JScrollPane(centroPanel);
         scrollCentro.setBorder(BorderFactory.createEmptyBorder());
         scrollCentro.getVerticalScrollBar().setUnitIncrement(16);
         centroContainer.add(scrollCentro, BorderLayout.CENTER);
-        
-        add(centroContainer, BorderLayout.CENTER);
-        // ----------------------------------------------------------
 
-        // ======== RODAPÉ (Promoções) =========
-        // JPanel rodapePanel = new JPanel(new GridLayout(1, 2));
-        // rodapePanel.setBackground(COR_BACKGROUND);
-        // rodapePanel.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY));
-        
-        // lblPromocao = new JLabel("Promoção: R$152,80 ou 7.000 pontos!", SwingConstants.CENTER);
-        // lblPromocao.setFont(FONTE_PADRAO);
-        // lblNovosDestinos = new JLabel("<html>Novos destinos diretos:<br>Porto Seguro, Salvador, Fortaleza<br>Saindo de Congonhas</html>", SwingConstants.CENTER);
-        // lblNovosDestinos.setFont(FONTE_PADRAO);
-        
-        // rodapePanel.add(lblPromocao);
-        // rodapePanel.add(lblNovosDestinos);
-        // add(rodapePanel, BorderLayout.SOUTH);
+        add(centroContainer, BorderLayout.CENTER);
 
         configurarEventos();
     }
@@ -134,6 +114,8 @@ public class TelaInicial extends JFrame {
         headerPanel.setBackground(Color.WHITE);
         headerPanel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
         headerPanel.setPreferredSize(new Dimension(800, 70));
+
+        // Logo
         ImageIcon logoIcon = new ImageIcon(getClass().getResource("logo.png"));
         JLabel lblLogo = new JLabel();
         if (logoIcon.getImage() != null) {
@@ -146,33 +128,66 @@ public class TelaInicial extends JFrame {
         }
         lblLogo.setBorder(new EmptyBorder(10, 20, 10, 20));
         headerPanel.add(lblLogo, BorderLayout.WEST);
-        
-        // --- NOVA FUNCIONALIDADE: Logo clicável ---
+
+        // Logo clicável
         lblLogo.setCursor(new Cursor(Cursor.HAND_CURSOR));
         lblLogo.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                // Como já está na TelaInicial, apenas limpa os campos
                 txtOrigem.setText("");
                 txtDestino.setText("");
-                txtData.setValue(null); // Limpa a máscara
+                txtData.setValue(null);
             }
         });
-        // -------------------------------------------
 
         JPanel painelBotoes = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 15));
         painelBotoes.setBackground(Color.WHITE);
+
+        // Botão Check-in
+        JButton btnCheckin = new JButton("Check-in");
+        estilizarBotaoHeader(btnCheckin);
+        btnCheckin.addActionListener(e -> {
+            new TelaCheckin().setVisible(true);
+        });
+        painelBotoes.add(btnCheckin);
+
         btnMinhasReservas = new JButton("Minhas Reservas");
         estilizarBotaoHeader(btnMinhasReservas);
         painelBotoes.add(btnMinhasReservas);
-        btnLogin = new JButton("Login");
-        estilizarBotaoHeader(btnLogin);
-        painelBotoes.add(btnLogin);
+
+        // Lógica de Login
+        String usuario = SessaoUsuario.getNomeUsuario();
+        if (usuario != null && !usuario.equals("Fulano")) {
+            JLabel lblUsuario = new JLabel("Olá, " + usuario);
+            lblUsuario.setFont(new Font("Arial", Font.BOLD, 14));
+            lblUsuario.setForeground(COR_PRINCIPAL);
+            painelBotoes.add(lblUsuario);
+
+            JButton btnSair = new JButton("(Sair)");
+            estilizarBotaoHeader(btnSair);
+            btnSair.setForeground(Color.RED);
+            btnSair.setFont(new Font("Arial", Font.PLAIN, 12));
+            btnSair.addActionListener(e -> {
+                SessaoUsuario.setNomeUsuario("Fulano");
+                new TelaInicial().setVisible(true);
+                dispose();
+            });
+            painelBotoes.add(btnSair);
+        } else {
+            btnLogin = new JButton("Login");
+            estilizarBotaoHeader(btnLogin);
+            btnLogin.addActionListener(e -> {
+                tela_login telaLogin = new tela_login();
+                telaLogin.setVisible(true);
+                dispose();
+            });
+            painelBotoes.add(btnLogin);
+        }
+
         headerPanel.add(painelBotoes, BorderLayout.EAST);
         return headerPanel;
     }
 
-    // --- NOVA FUNCIONALIDADE: Método para criar o painel de voos ---
     private JPanel criarPainelVoosDestaque() {
         JPanel painel = new JPanel(new BorderLayout(0, 15));
         painel.setBackground(Color.WHITE);
@@ -182,12 +197,11 @@ public class TelaInicial extends JFrame {
         tituloVoos.setForeground(COR_PRINCIPAL);
         painel.add(tituloVoos, BorderLayout.NORTH);
 
-        JPanel gridPanel = new JPanel(new GridLayout(0, 4, 15, 15)); // 0 linhas, 4 colunas, 15px de gap
+        JPanel gridPanel = new JPanel(new GridLayout(0, 4, 15, 15));
         gridPanel.setBackground(Color.WHITE);
 
         List<Reserva> reservas = DadosReservas.getReservas();
-        
-        // Pega os 4 primeiros voos da lista mock
+
         for (int i = 0; i < 4 && i < reservas.size(); i++) {
             gridPanel.add(criarCardVoo(reservas.get(i)));
         }
@@ -195,15 +209,13 @@ public class TelaInicial extends JFrame {
         painel.add(gridPanel, BorderLayout.CENTER);
         return painel;
     }
-    
-    // --- NOVA FUNCIONALIDADE: Método helper para criar um card ---
+
     private JPanel criarCardVoo(Reserva r) {
         JPanel card = new JPanel();
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
         card.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(Color.LIGHT_GRAY),
-            new EmptyBorder(10, 10, 10, 10)
-        ));
+                BorderFactory.createLineBorder(Color.LIGHT_GRAY),
+                new EmptyBorder(10, 10, 10, 10)));
         card.setBackground(Color.WHITE);
 
         JLabel lblOrigem = new JLabel(r.getOrigem());
@@ -213,7 +225,7 @@ public class TelaInicial extends JFrame {
         JLabel lblDestino = new JLabel(r.getDestino());
         lblDestino.setFont(new Font("Arial", Font.BOLD, 16));
         lblDestino.setAlignmentX(Component.CENTER_ALIGNMENT);
-        
+
         JLabel lblPreco = new JLabel(r.getPrecoFormatado());
         lblPreco.setFont(new Font("Arial", Font.BOLD, 14));
         lblPreco.setForeground(COR_DESTAQUE);
@@ -223,13 +235,11 @@ public class TelaInicial extends JFrame {
         card.add(lblDestino);
         card.add(Box.createVerticalStrut(5));
         card.add(lblPreco);
-        
-        // Adiciona um cursor de "mão" para indicar que é clicável
+
         card.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        
+
         return card;
     }
-    // -----------------------------------------------------------------
 
     private void estilizarBotaoHeader(JButton botao) {
         botao.setFont(FONTE_PADRAO);
@@ -251,14 +261,13 @@ public class TelaInicial extends JFrame {
         JTextField textField = new JTextField(columns);
         textField.setFont(FONTE_PADRAO);
         textField.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(Color.GRAY),
-            new EmptyBorder(5, 5, 5, 5)
-        ));
+                BorderFactory.createLineBorder(Color.GRAY),
+                new EmptyBorder(5, 5, 5, 5)));
         return textField;
     }
 
     private JPanel wrapTextField(JComponent component) {
-        JPanel wrapper = new JPanel(new FlowLayout(FlowLayout.LEFT)); 
+        JPanel wrapper = new JPanel(new FlowLayout(FlowLayout.LEFT));
         wrapper.setBackground(Color.WHITE);
         wrapper.add(component);
         return wrapper;
@@ -271,31 +280,24 @@ public class TelaInicial extends JFrame {
                 String origem = txtOrigem.getText().trim();
                 String destino = txtDestino.getText().trim();
                 String data = txtData.getText();
-                
+
                 boolean dataVazia = data.contains("_");
-                
-                // --- NOVA FUNCIONALIDADE: Validação de cidade igual ---
+
                 if (!origem.isEmpty() && origem.equalsIgnoreCase(destino)) {
                     JOptionPane.showMessageDialog(
-                        TelaInicial.this, 
-                        "Origem e Destino não podem ser iguais.\nNão é possível realizar voos para a mesma cidade.", 
-                        "Erro na Busca", 
-                        JOptionPane.WARNING_MESSAGE
-                    );
-                    return; // Para a execução
+                            TelaInicial.this,
+                            "Origem e Destino não podem ser iguais.\nNão é possível realizar voos para a mesma cidade.",
+                            "Erro na Busca",
+                            JOptionPane.WARNING_MESSAGE);
+                    return;
                 }
-                // -------------------------------------------------------
 
                 if (origem.isEmpty() || destino.isEmpty() || dataVazia) {
-                    JOptionPane.showMessageDialog(TelaInicial.this, "Preencha todos os campos para buscar voos!", "Erro", JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(TelaInicial.this, "Preencha todos os campos para buscar voos!",
+                            "Erro", JOptionPane.WARNING_MESSAGE);
                 } else {
-                    // --- ALTERAÇÃO: Abre a nova tela de resultados ---
-                    // JOptionPane.showMessageDialog(TelaInicial.this,
-                    //    "Buscando voos de " + origem + " para " + destino + " em " + data, "Busca", JOptionPane.INFORMATION_MESSAGE);
-                    
                     TelaResultadosBusca dialog = new TelaResultadosBusca(TelaInicial.this, origem, destino, data);
                     dialog.setVisible(true);
-                    // -------------------------------------------------------
                 }
             }
         });
@@ -303,16 +305,10 @@ public class TelaInicial extends JFrame {
         btnMinhasReservas.addActionListener(e -> {
             JFrame frameReservas = new JFrame("Minhas Reservas");
             frameReservas.setSize(1000, 700);
-            frameReservas.setLocationRelativeTo(null); 
+            frameReservas.setLocationRelativeTo(null);
             frameReservas.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-            frameReservas.add(new tela_reserva(this)); 
+            frameReservas.add(new tela_reserva(this));
             frameReservas.setVisible(true);
-            dispose();
-        });
-
-        btnLogin.addActionListener(e -> {
-            tela_login telaLogin = new tela_login();
-            telaLogin.setVisible(true);
             dispose();
         });
     }
@@ -323,7 +319,7 @@ public class TelaInicial extends JFrame {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
+
         SwingUtilities.invokeLater(() -> {
             TelaInicial tela = new TelaInicial();
             tela.setVisible(true);

@@ -2,8 +2,8 @@ import java.text.NumberFormat;
 import java.util.Locale;
 
 /**
- * Classe de modelo (POJO) que representa UMA reserva com todos os seus detalhes.
- * (Sem alterações nesta classe)
+ * Classe de modelo (POJO) que representa UMA reserva com todos os seus
+ * detalhes.
  */
 public class Reserva {
 
@@ -33,7 +33,10 @@ public class Reserva {
     private static final NumberFormat FORMATO_MOEDA = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
 
     // Construtor
-    public Reserva(String codigo, String origem, String destino, String dataHoraPartida, String companhiaAerea, String status, double preco, String numeroVoo, String aeroportoOrigem, String aeroportoDestino, String dataHoraChegada, String terminalPartida, String portaoEmbarque, String nomePassageiro, String documentoPassageiro, String assento, String dataCompra, String metodoPagamento) {
+    public Reserva(String codigo, String origem, String destino, String dataHoraPartida, String companhiaAerea,
+            String status, double preco, String numeroVoo, String aeroportoOrigem, String aeroportoDestino,
+            String dataHoraChegada, String terminalPartida, String portaoEmbarque, String nomePassageiro,
+            String documentoPassageiro, String assento, String dataCompra, String metodoPagamento) {
         this.codigo = codigo;
         this.origem = origem;
         this.destino = destino;
@@ -83,7 +86,7 @@ public class Reserva {
     public double getPreco() {
         return preco;
     }
-    
+
     public String getPrecoFormatado() {
         return FORMATO_MOEDA.format(preco);
     }
@@ -131,9 +134,9 @@ public class Reserva {
     public String getMetodoPagamento() {
         return metodoPagamento;
     }
-    
+
     // --- Getters Helper (para a tabela) ---
-    
+
     /**
      * Retorna o HTML formatado para a coluna da tabela.
      */
@@ -153,5 +156,13 @@ public class Reserva {
 
     public void setAssento(String assento) {
         this.assento = assento;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public void setMetodoPagamento(String metodoPagamento) {
+        this.metodoPagamento = metodoPagamento;
     }
 }
