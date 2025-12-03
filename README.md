@@ -23,16 +23,10 @@ Telas de `tela_login` e `tela_cadastro` totalmente funcionais. O nome do usuári
 ### Busca de Voos (RF01, RF02)
 A `TelaInicial` permite a busca por origem e destino. O sistema valida buscas com a mesma cidade (RF01) e exibe resultados gerados aleatoriamente em `TelaResultadosBusca`.
 
-> **[INSERIR IMAGEM AQUI]**
-> **Tela:** `TelaInicial`
-> **Funcionalidade:** Demonstração dos campos de busca de voos e os cards de "Voos em Destaque".
 
 ### Fluxo de Compra e Reserva (RF06, RF09)
 Na tela de resultados, o usuário tem duas opções: "Selecionar Voo" (leva ao `TelaPagamento`) ou "Reservar Voo" (adiciona o voo à `tela_reserva` com status "Pendente").
 
-> **[INSERIR IMAGEM AQUI]**
-> **Tela:** `TelaResultadosBusca`
-> **Funcionalidade:** Exibição da lista de voos encontrados e os botões "Reservar Voo" e "Selecionar Voo".
 
 ### Gerenciamento de Reservas (RF09, RF10)
 A `tela_reserva` lista todos os voos (mockados e recém-adicionados). O usuário pode clicar para ver detalhes (`tela_detalhes_reserva`) ou remover uma reserva.
