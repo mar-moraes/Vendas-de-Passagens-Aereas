@@ -37,21 +37,23 @@ public class TelaInicial extends JFrame {
         JPanel centroContainer = new JPanel(new BorderLayout());
         centroContainer.setBackground(Color.WHITE);
 
-        JPanel centroPanel = new JPanel();
-        centroPanel.setLayout(new BoxLayout(centroPanel, BoxLayout.Y_AXIS));
-        centroPanel.setBorder(new EmptyBorder(40, 50, 40, 50));
-        centroPanel.setBackground(Color.WHITE);
+        // Painel de conteúdo (vertical)
+        JPanel contentPanel = new JPanel();
+        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
+        contentPanel.setBorder(new EmptyBorder(20, 20, 20, 20)); // Menor borda interna
+        contentPanel.setBackground(Color.WHITE);
 
         JLabel titulo = new JLabel("Para onde você quer ir?", SwingConstants.CENTER);
         titulo.setFont(new Font("Arial", Font.BOLD, 28));
         titulo.setAlignmentX(Component.CENTER_ALIGNMENT);
         titulo.setForeground(COR_PRINCIPAL);
-        centroPanel.add(titulo);
-        centroPanel.add(Box.createVerticalStrut(30));
+        contentPanel.add(titulo);
+        contentPanel.add(Box.createVerticalStrut(30));
 
         // Painel de campos
         JPanel painelCampos = new JPanel(new GridLayout(3, 2, 10, 10));
         painelCampos.setBackground(Color.WHITE);
+        painelCampos.setMaximumSize(new Dimension(600, 150)); // Limita largura dos campos
 
         painelCampos.add(criarLabelCampo("Origem:"));
         txtOrigem = criarTextFieldCampo(20);
@@ -79,8 +81,8 @@ public class TelaInicial extends JFrame {
         }
         painelCampos.add(wrapTextField(txtData));
 
-        centroPanel.add(painelCampos);
-        centroPanel.add(Box.createVerticalStrut(30));
+        contentPanel.add(painelCampos);
+        contentPanel.add(Box.createVerticalStrut(30));
 
         // Botão buscar voos
         btnBuscarVoos = new JButton("Buscar Voos");
@@ -92,14 +94,19 @@ public class TelaInicial extends JFrame {
         btnBuscarVoos.setFocusPainted(false);
         btnBuscarVoos.setPreferredSize(new Dimension(200, 40));
         btnBuscarVoos.setMaximumSize(new Dimension(200, 40));
-        centroPanel.add(btnBuscarVoos);
+        contentPanel.add(btnBuscarVoos);
 
         // --- Painel de Cards de Voos ---
-        centroPanel.add(Box.createVerticalStrut(30));
-        centroPanel.add(criarPainelVoosDestaque());
+        contentPanel.add(Box.createVerticalStrut(30));
+        contentPanel.add(criarPainelVoosDestaque());
         // ----------------------------------------------------
 
-        JScrollPane scrollCentro = new JScrollPane(centroPanel);
+        // Wrapper para centralizar
+        JPanel wrapperPanel = new JPanel(new GridBagLayout());
+        wrapperPanel.setBackground(Color.WHITE);
+        wrapperPanel.add(contentPanel);
+
+        JScrollPane scrollCentro = new JScrollPane(wrapperPanel);
         scrollCentro.setBorder(BorderFactory.createEmptyBorder());
         scrollCentro.getVerticalScrollBar().setUnitIncrement(16);
         centroContainer.add(scrollCentro, BorderLayout.CENTER);

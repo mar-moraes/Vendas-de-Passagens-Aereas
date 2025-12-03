@@ -17,17 +17,16 @@ public class TelaSelecaoAssentos extends JFrame {
 
     private List<JButton> assentosSelecionados = new ArrayList<>();
     private String assentoEscolhido = null;
-    private Frame owner;
     private Object[] dadosVoo; // Para passar para a próxima tela
 
-    public TelaSelecaoAssentos(Frame owner, Object[] dadosVoo) {
-        this.owner = owner;
+    public TelaSelecaoAssentos(Object[] dadosVoo) {
+        super("Seleção de Assentos - Boeing 737");
         this.dadosVoo = dadosVoo;
 
-        setTitle("Seleção de Assentos - Boeing 737");
         setSize(500, 800);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
+        setResizable(true);
         setLayout(new BorderLayout());
         getContentPane().setBackground(Color.WHITE);
 

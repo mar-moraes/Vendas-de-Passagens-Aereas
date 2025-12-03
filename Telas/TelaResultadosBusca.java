@@ -111,15 +111,17 @@ public class TelaResultadosBusca extends JDialog {
                 this.origem, this.destino
         };
 
-        JOptionPane.showMessageDialog(this, "Voo selecionado! Escolha seu assento.", "Sucesso",
-                JOptionPane.INFORMATION_MESSAGE);
-
         Window owner = getOwner();
 
-        TelaSelecaoAssentos telaAssentos = new TelaSelecaoAssentos((Frame) owner, dadosVoo);
-        telaAssentos.setVisible(true);
-
+        // Fecha a tela inicial (owner) e a tela de resultados (this)
+        // para dar lugar à TelaSelecaoAssentos como janela principal (JFrame)
+        if (owner != null) {
+            owner.dispose();
+        }
         this.dispose();
+
+        TelaSelecaoAssentos telaAssentos = new TelaSelecaoAssentos(dadosVoo);
+        telaAssentos.setVisible(true);
     }
 
     private void acaoReservarVoo() {
@@ -158,22 +160,19 @@ public class TelaResultadosBusca extends JDialog {
 
         DadosReservas.adicionarReserva(novaReserva);
 
-        JOptionPane.showMessageDialog(this,
-                "Voo reservado com sucesso! (Status: Pendente)\nVocê será redirecionado para 'Minhas Reservas'.",
-                "Reserva Concluída",
-                JOptionPane.INFORMATION_MESSAGE);
-
         Window owner = getOwner();
+
+        if (owner != null) {
+            owner.dispose();
+        }
+        this.dispose();
 
         JFrame frameReservas = new JFrame("Minhas Reservas");
         frameReservas.setSize(1000, 700);
         frameReservas.setLocationRelativeTo(null);
-        frameReservas.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frameReservas.add(new tela_reserva((JFrame) owner));
+        frameReservas.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frameReservas.add(new tela_reserva(null));
         frameReservas.setVisible(true);
-
-        owner.dispose();
-        this.dispose();
     }
 
     private void gerarDadosAleatorios(String dataBusca) {

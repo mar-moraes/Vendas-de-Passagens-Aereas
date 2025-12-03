@@ -1,178 +1,286 @@
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.text.MaskFormatter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.text.ParseException;
 
 public class TelaPagamento extends JFrame {
 
     private JButton btnVoltar, btnConfirmar;
-    private JRadioButton rbCredito, rbDebito, rbPontos, rbPix;
-    private JTextField txtNumeroCartao, txtValidade, txtCVV, txtNomeTitular;
+    private JRadioButton rbCartaoSalvo, rbPix, rbNovoCartao, rbBoleto;
+    private JTextField txtNumeroCartao, txtNomeTitular, txtValidade, txtCVV, txtCPF;
     private ButtonGroup grupoPagamento;
-    private JPanel painelDadosCartao, painelPix;
+    private JPanel painelNovoCartao;
     private Reserva reservaPendente;
 
     // --- Constantes de Design ---
     private static final Color COR_PRINCIPAL = new Color(0, 51, 153);
-    private static final Color COR_DESTAQUE = new Color(255, 102, 0);
+    private static final Color COR_DESTAQUE = new Color(0, 102, 204); // Azul mais claro para botões
     private static final Font FONTE_PADRAO = new Font("Arial", Font.PLAIN, 14);
+    private static final Font FONTE_BOLD = new Font("Arial", Font.BOLD, 14);
     // ----------------------------
+
+    public TelaPagamento(Reserva reservaPendente) {
+        super("Tela de Pagamento");
+        this.reservaPendente = reservaPendente;
+
+        setSize(600, 750);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+        setResizable(true);
+        setLayout(new BorderLayout());
+        getContentPane().setBackground(new Color(245, 245, 245)); // Fundo cinza claro
+
+        add(criarHeaderPagamento(), BorderLayout.NORTH);
+
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        mainPanel.setBorder(new EmptyBorder(20, 40, 20, 40));
+        mainPanel.setBackground(new Color(245, 245, 245));
+
+        // --- Opções de Pagamento ---
+        grupoPagamento = new ButtonGroup();
+
+        // 1. Cartão Salvo
+        rbCartaoSalvo = criarOpcaoPagamento("Cartão **** 1234");
+        mainPanel.add(criarPainelOpcao(rbCartaoSalvo));
+        mainPanel.add(Box.createVerticalStrut(10));
+
+        // 2. Pix
+        rbPix = criarOpcaoPagamento("Pix");
+        mainPanel.add(criarPainelOpcao(rbPix));
+        mainPanel.add(Box.createVerticalStrut(20));
+
+        // Label "Cartões"
+        JLabel lblCartoes = new JLabel("Cartões");
+        lblCartoes.setFont(FONTE_PADRAO);
+        lblCartoes.setAlignmentX(Component.LEFT_ALIGNMENT);
+        mainPanel.add(lblCartoes);
+        mainPanel.add(Box.createVerticalStrut(5));
+
+        // 3. Novo Cartão de Crédito
+        rbNovoCartao = criarOpcaoPagamento("Novo cartão de crédito");
+        rbNovoCartao.setSelected(true); // Default
+        JPanel painelNovoCartaoContainer = criarPainelOpcao(rbNovoCartao);
+
+        // Formulário do Novo Cartão (dentro do container)
+        painelNovoCartao = criarFormularioNovoCartao();
+        painelNovoCartaoContainer.add(painelNovoCartao, BorderLayout.SOUTH);
+
+        mainPanel.add(painelNovoCartaoContainer);
+        mainPanel.add(Box.createVerticalStrut(20));
+
+        // Label "Outros meios de pagamento"
+        JLabel lblOutros = new JLabel("Outros meios de pagamento");
+        lblOutros.setFont(FONTE_PADRAO);
+        lblOutros.setAlignmentX(Component.LEFT_ALIGNMENT);
+        mainPanel.add(lblOutros);
+        mainPanel.add(Box.createVerticalStrut(5));
+
+        // 4. Boleto
+        rbBoleto = criarOpcaoPagamento("Boleto");
+        mainPanel.add(criarPainelOpcao(rbBoleto));
+
+        mainPanel.add(Box.createVerticalStrut(30));
+
+        // Botão Confirmar
+        btnConfirmar = new JButton("Continuar");
+        btnConfirmar.setFont(new Font("Arial", Font.BOLD, 16));
+        btnConfirmar.setBackground(COR_DESTAQUE);
+        btnConfirmar.setForeground(Color.WHITE);
+        btnConfirmar.setFocusPainted(false);
+        btnConfirmar.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnConfirmar.setAlignmentX(Component.LEFT_ALIGNMENT); // Alinhar à esquerda (preencher largura)
+
+        // Tamanho: largura máxima para preencher o painel, altura fixa
+        btnConfirmar.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+        // Remover setPreferredSize fixo para permitir expansão ou definir apenas altura
+        btnConfirmar.setPreferredSize(new Dimension(0, 40));
+
+        mainPanel.add(btnConfirmar);
+
+        JScrollPane scrollPane = new JScrollPane(mainPanel);
+        scrollPane.setBorder(null);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        add(scrollPane, BorderLayout.CENTER);
+
+        configurarEventos();
+    }
 
     public TelaPagamento() {
         this(null);
     }
 
-    public TelaPagamento(Reserva reservaPendente) {
-        this.reservaPendente = reservaPendente;
+    private JRadioButton criarOpcaoPagamento(String texto) {
+        JRadioButton rb = new JRadioButton(texto);
+        rb.setFont(FONTE_BOLD);
+        rb.setBackground(Color.WHITE);
+        rb.setFocusPainted(false);
+        grupoPagamento.add(rb);
+        return rb;
+    }
 
-        setTitle("Tela de Pagamento");
-        setSize(600, 750);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
-        setLayout(new BorderLayout());
-        getContentPane().setBackground(Color.WHITE);
+    private JPanel criarPainelOpcao(JRadioButton rb) {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(Color.WHITE);
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        panel.setAlignmentX(Component.LEFT_ALIGNMENT); // Alinhar à esquerda no BoxLayout
 
-        add(criarHeaderPagamento(), BorderLayout.NORTH);
+        // Wrapper para o RadioButton para adicionar margem/padding se necessário
+        JPanel rbPanel = new JPanel(new BorderLayout());
+        rbPanel.setBackground(Color.WHITE);
+        rbPanel.add(rb, BorderLayout.NORTH);
 
-        JPanel centroPanel = new JPanel();
-        centroPanel.setLayout(new BoxLayout(centroPanel, BoxLayout.Y_AXIS));
-        centroPanel.setBorder(new EmptyBorder(30, 50, 30, 50));
-        centroPanel.setBackground(Color.WHITE);
+        panel.add(rbPanel, BorderLayout.CENTER);
 
-        JLabel titulo = new JLabel("Pagamento Seguro", SwingConstants.CENTER);
-        titulo.setFont(new Font("Arial", Font.BOLD, 28));
-        titulo.setAlignmentX(Component.CENTER_ALIGNMENT);
-        titulo.setForeground(COR_PRINCIPAL);
-        centroPanel.add(titulo);
+        // Borda arredondada simulada (apenas visual simples por enquanto)
+        panel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1, true),
+                new EmptyBorder(5, 5, 5, 5)));
 
-        if (this.reservaPendente != null) {
-            JLabel lblValor = new JLabel("Valor a Pagar: " + this.reservaPendente.getPrecoFormatado());
-            lblValor.setFont(new Font("Arial", Font.BOLD, 18));
-            lblValor.setForeground(COR_DESTAQUE);
-            lblValor.setAlignmentX(Component.CENTER_ALIGNMENT);
-            centroPanel.add(Box.createVerticalStrut(10));
-            centroPanel.add(lblValor);
-        }
+        return panel;
+    }
 
-        centroPanel.add(Box.createVerticalStrut(30));
+    private JPanel criarFormularioNovoCartao() {
+        JPanel form = new JPanel();
+        form.setLayout(new BoxLayout(form, BoxLayout.Y_AXIS));
+        form.setBackground(Color.WHITE);
+        form.setBorder(new EmptyBorder(10, 25, 0, 0)); // Indentação
+        form.setAlignmentX(Component.LEFT_ALIGNMENT); // Alinhar à esquerda
 
-        JPanel painelFormas = new JPanel();
-        painelFormas.setLayout(new BoxLayout(painelFormas, BoxLayout.Y_AXIS));
-        painelFormas.setBackground(Color.WHITE);
-        painelFormas.setBorder(BorderFactory.createTitledBorder("Forma de Pagamento"));
-
-        rbCredito = new JRadioButton("Cartão de Crédito");
-        estilizarRadioButton(rbCredito);
-        rbDebito = new JRadioButton("Cartão de Débito");
-        estilizarRadioButton(rbDebito);
-        rbPontos = new JRadioButton("Pontos (Programa de Fidelidade)");
-        estilizarRadioButton(rbPontos);
-        rbPix = new JRadioButton("PIX (Pagamento Instantâneo)");
-        estilizarRadioButton(rbPix);
-
-        grupoPagamento = new ButtonGroup();
-        grupoPagamento.add(rbCredito);
-        grupoPagamento.add(rbDebito);
-        grupoPagamento.add(rbPontos);
-        grupoPagamento.add(rbPix);
-
-        painelFormas.add(rbCredito);
-        painelFormas.add(rbDebito);
-        painelFormas.add(rbPontos);
-        painelFormas.add(rbPix);
-
-        centroPanel.add(painelFormas);
-        centroPanel.add(Box.createVerticalStrut(20));
-
-        // --- Painel Cartão ---
-        painelDadosCartao = new JPanel();
-        painelDadosCartao.setLayout(new GridLayout(0, 1, 5, 10));
-        painelDadosCartao.setBackground(Color.WHITE);
-        painelDadosCartao.setBorder(BorderFactory.createTitledBorder("Dados do Cartão"));
-
-        painelDadosCartao.add(criarLabelCampo("Nome do Titular:"));
-        txtNomeTitular = criarTextFieldCampo();
-        painelDadosCartao.add(txtNomeTitular);
-
-        painelDadosCartao.add(criarLabelCampo("Número do Cartão:"));
+        form.add(criarLabelCampo("Número do cartão"));
         try {
-            javax.swing.text.MaskFormatter maskCard = new javax.swing.text.MaskFormatter("#### #### #### ####");
-            maskCard.setPlaceholderCharacter('_');
+            MaskFormatter maskCard = new MaskFormatter("#### #### #### ####");
+            maskCard.setPlaceholderCharacter(' ');
             txtNumeroCartao = new JFormattedTextField(maskCard);
-            estilizarCampo(txtNumeroCartao);
-        } catch (java.text.ParseException e) {
-            txtNumeroCartao = criarTextFieldCampo();
+        } catch (ParseException e) {
+            txtNumeroCartao = new JTextField();
         }
-        painelDadosCartao.add(txtNumeroCartao);
+        estilizarCampo(txtNumeroCartao);
+        form.add(txtNumeroCartao);
+        form.add(Box.createVerticalStrut(10));
 
-        JPanel painelValidadeCVV = new JPanel(new GridLayout(1, 2, 10, 0));
-        painelValidadeCVV.setBackground(Color.WHITE);
+        form.add(criarLabelCampo("Nome do titular"));
+        txtNomeTitular = new JTextField();
+        estilizarCampo(txtNomeTitular);
+        txtNomeTitular.setText("Ex.: Fulano Silva");
+        txtNomeTitular.setForeground(Color.GRAY);
+        txtNomeTitular.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                if (txtNomeTitular.getText().equals("Ex.: Fulano Silva")) {
+                    txtNomeTitular.setText("");
+                    txtNomeTitular.setForeground(Color.BLACK);
+                }
+            }
 
-        JPanel painelValidade = new JPanel(new BorderLayout());
-        painelValidade.setBackground(Color.WHITE);
-        painelValidade.add(criarLabelCampo("Validade (MM/AA):"), BorderLayout.NORTH);
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                if (txtNomeTitular.getText().isEmpty()) {
+                    txtNomeTitular.setText("Ex.: Fulano Silva");
+                    txtNomeTitular.setForeground(Color.GRAY);
+                }
+            }
+        });
+        form.add(txtNomeTitular);
+        form.add(Box.createVerticalStrut(10));
+
+        // Linha Vencimento e CVV
+        JPanel row3 = new JPanel(new GridLayout(1, 2, 10, 0));
+        row3.setBackground(Color.WHITE);
+        row3.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JPanel pValidade = new JPanel(new BorderLayout());
+        pValidade.setBackground(Color.WHITE);
+        pValidade.add(criarLabelCampo("Vencimento"), BorderLayout.NORTH);
         try {
-            javax.swing.text.MaskFormatter maskVal = new javax.swing.text.MaskFormatter("##/##");
-            maskVal.setPlaceholderCharacter('_');
+            MaskFormatter maskVal = new MaskFormatter("##/##");
+            maskVal.setPlaceholderCharacter(' ');
             txtValidade = new JFormattedTextField(maskVal);
-            estilizarCampo(txtValidade);
-        } catch (java.text.ParseException e) {
-            txtValidade = criarTextFieldCampo();
+        } catch (ParseException e) {
+            txtValidade = new JTextField();
         }
-        painelValidade.add(txtValidade, BorderLayout.CENTER);
+        estilizarCampo(txtValidade);
+        // Placeholder MM/AA
+        txtValidade.setText("MM/AA");
+        txtValidade.setForeground(Color.GRAY);
+        txtValidade.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                if (txtValidade.getText().equals("MM/AA")) {
+                    txtValidade.setText("");
+                    txtValidade.setForeground(Color.BLACK);
+                }
+            }
+        });
+        pValidade.add(txtValidade, BorderLayout.CENTER);
 
-        JPanel painelCVV = new JPanel(new BorderLayout());
-        painelCVV.setBackground(Color.WHITE);
-        painelCVV.add(criarLabelCampo("CVV:"), BorderLayout.NORTH);
+        JPanel pCVV = new JPanel(new BorderLayout());
+        pCVV.setBackground(Color.WHITE);
+        pCVV.add(criarLabelCampo("Código de segurança"), BorderLayout.NORTH);
         try {
-            javax.swing.text.MaskFormatter maskCVV = new javax.swing.text.MaskFormatter("###");
-            maskCVV.setPlaceholderCharacter('_');
+            MaskFormatter maskCVV = new MaskFormatter("###");
+            maskCVV.setPlaceholderCharacter(' ');
             txtCVV = new JFormattedTextField(maskCVV);
-            estilizarCampo(txtCVV);
-        } catch (java.text.ParseException e) {
-            txtCVV = criarTextFieldCampo();
+        } catch (ParseException e) {
+            txtCVV = new JTextField();
         }
-        painelCVV.add(txtCVV, BorderLayout.CENTER);
+        estilizarCampo(txtCVV);
+        txtCVV.setText("Ex.: 123");
+        txtCVV.setForeground(Color.GRAY);
+        txtCVV.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                if (txtCVV.getText().equals("Ex.: 123")) {
+                    txtCVV.setText("");
+                    txtCVV.setForeground(Color.BLACK);
+                }
+            }
+        });
+        pCVV.add(txtCVV, BorderLayout.CENTER);
 
-        painelValidadeCVV.add(painelValidade);
-        painelValidadeCVV.add(painelCVV);
-        painelDadosCartao.add(painelValidadeCVV);
-        painelDadosCartao.setVisible(false);
-        centroPanel.add(painelDadosCartao);
+        row3.add(pValidade);
+        row3.add(pCVV);
+        form.add(row3);
+        form.add(Box.createVerticalStrut(10));
 
-        // --- Painel PIX ---
-        painelPix = new JPanel(new BorderLayout());
-        painelPix.setBackground(Color.WHITE);
-        painelPix.setBorder(BorderFactory.createTitledBorder("Pagamento via PIX"));
-        JLabel lblQrCode = new JLabel("QR Code Simulado", SwingConstants.CENTER);
-        lblQrCode.setPreferredSize(new Dimension(150, 150));
-        lblQrCode.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        painelPix.add(lblQrCode, BorderLayout.CENTER);
-        JLabel lblChave = new JLabel("Chave Aleatória: 123e4567-e89b-12d3-a456-426614174000", SwingConstants.CENTER);
-        lblChave.setFont(new Font("Monospaced", Font.PLAIN, 12));
-        painelPix.add(lblChave, BorderLayout.SOUTH);
-        painelPix.setVisible(false);
-        centroPanel.add(painelPix);
+        // Documento do titular
+        form.add(criarLabelCampo("Documento do titular"));
+        JPanel pDoc = new JPanel(new BorderLayout(5, 0));
+        pDoc.setBackground(Color.WHITE);
+        pDoc.setAlignmentX(Component.LEFT_ALIGNMENT);
+        JComboBox<String> comboDoc = new JComboBox<>(new String[] { "CPF", "CNPJ" });
+        comboDoc.setBackground(Color.WHITE);
+        pDoc.add(comboDoc, BorderLayout.WEST);
 
-        centroPanel.add(Box.createVerticalStrut(30));
+        try {
+            MaskFormatter maskCPF = new MaskFormatter("###.###.###-##");
+            maskCPF.setPlaceholderCharacter(' ');
+            txtCPF = new JFormattedTextField(maskCPF);
+        } catch (ParseException e) {
+            txtCPF = new JTextField();
+        }
+        estilizarCampo(txtCPF);
+        pDoc.add(txtCPF, BorderLayout.CENTER);
 
-        btnConfirmar = new JButton("Confirmar Pagamento");
-        btnConfirmar.setAlignmentX(Component.CENTER_ALIGNMENT);
-        btnConfirmar.setFont(new Font("Arial", Font.BOLD, 16));
-        btnConfirmar.setBackground(new Color(0, 120, 0));
-        btnConfirmar.setForeground(Color.WHITE);
-        btnConfirmar.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnConfirmar.setFocusPainted(false);
-        btnConfirmar.setPreferredSize(new Dimension(250, 40));
-        btnConfirmar.setMaximumSize(new Dimension(250, 40));
-        centroPanel.add(btnConfirmar);
+        form.add(pDoc);
 
-        add(centroPanel, BorderLayout.CENTER);
+        return form;
+    }
 
-        configurarEventos();
+    private JLabel criarLabelCampo(String texto) {
+        JLabel label = new JLabel(texto);
+        label.setFont(new Font("Arial", Font.PLAIN, 12));
+        label.setForeground(Color.DARK_GRAY);
+        return label;
+    }
+
+    private void estilizarCampo(JTextField campo) {
+        campo.setFont(FONTE_PADRAO);
+        campo.setPreferredSize(new Dimension(100, 35));
+        campo.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(Color.LIGHT_GRAY),
+                new EmptyBorder(5, 10, 5, 10)));
     }
 
     private JPanel criarHeaderPagamento() {
@@ -197,16 +305,7 @@ public class TelaPagamento extends JFrame {
         lblLogo.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                int confirm = JOptionPane.showConfirmDialog(
-                        TelaPagamento.this,
-                        "Deseja voltar à tela inicial? O pagamento atual será cancelado.",
-                        "Voltar ao Início",
-                        JOptionPane.YES_NO_OPTION,
-                        JOptionPane.WARNING_MESSAGE);
-                if (confirm == JOptionPane.YES_OPTION) {
-                    new TelaInicial().setVisible(true);
-                    dispose();
-                }
+                confirmarSaida();
             }
         });
 
@@ -228,100 +327,69 @@ public class TelaPagamento extends JFrame {
         return headerPanel;
     }
 
-    private void estilizarRadioButton(JRadioButton rb) {
-        rb.setFont(FONTE_PADRAO);
-        rb.setBackground(Color.WHITE);
-        rb.setCursor(new Cursor(Cursor.HAND_CURSOR));
-    }
-
-    private JLabel criarLabelCampo(String texto) {
-        JLabel label = new JLabel(texto);
-        label.setFont(new Font("Arial", Font.BOLD, 14));
-        label.setForeground(new Color(50, 50, 50));
-        return label;
-    }
-
-    private JTextField criarTextFieldCampo() {
-        JTextField textField = new JTextField();
-        estilizarCampo(textField);
-        return textField;
-    }
-
-    private void estilizarCampo(JTextField textField) {
-        textField.setFont(FONTE_PADRAO);
-        textField.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(Color.GRAY),
-                new EmptyBorder(5, 5, 5, 5)));
-    }
-
     private void configurarEventos() {
-        ActionListener listenerFormas = e -> {
-            painelDadosCartao.setVisible(false);
-            painelPix.setVisible(false);
-
-            if (rbCredito.isSelected() || rbDebito.isSelected()) {
-                painelDadosCartao.setVisible(true);
-            } else if (rbPix.isSelected()) {
-                painelPix.setVisible(true);
-            }
-            this.revalidate();
-            this.repaint();
+        ActionListener toggleForm = e -> {
+            painelNovoCartao.setVisible(rbNovoCartao.isSelected());
+            revalidate();
+            repaint();
         };
 
-        rbCredito.addActionListener(listenerFormas);
-        rbDebito.addActionListener(listenerFormas);
-        rbPontos.addActionListener(listenerFormas);
-        rbPix.addActionListener(listenerFormas);
+        rbCartaoSalvo.addActionListener(toggleForm);
+        rbPix.addActionListener(toggleForm);
+        rbNovoCartao.addActionListener(toggleForm);
+        rbBoleto.addActionListener(toggleForm);
 
-        btnVoltar.addActionListener(e -> {
+        btnVoltar.addActionListener(e -> confirmarSaida());
+
+        btnConfirmar.addActionListener(e -> processarPagamento());
+    }
+
+    private void confirmarSaida() {
+        int confirm = JOptionPane.showConfirmDialog(
+                this,
+                "Deseja voltar à tela inicial? O pagamento atual será cancelado.",
+                "Voltar ao Início",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE);
+        if (confirm == JOptionPane.YES_OPTION) {
             new TelaInicial().setVisible(true);
             dispose();
-        });
+        }
+    }
 
-        btnConfirmar.addActionListener(e -> {
-            if (!rbCredito.isSelected() && !rbDebito.isSelected() && !rbPontos.isSelected() && !rbPix.isSelected()) {
-                JOptionPane.showMessageDialog(TelaPagamento.this, "Selecione uma forma de pagamento!", "Erro",
+    private void processarPagamento() {
+        if (rbNovoCartao.isSelected()) {
+            // Validação simples
+            if (txtNumeroCartao.getText().trim().isEmpty() || txtNomeTitular.getText().trim().isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Preencha os dados do cartão.", "Erro",
                         JOptionPane.WARNING_MESSAGE);
                 return;
             }
+        }
 
-            if (rbCredito.isSelected() || rbDebito.isSelected()) {
-                String nome = txtNomeTitular.getText().trim();
-                String numero = txtNumeroCartao.getText().trim();
-                String validade = txtValidade.getText().trim();
-                String cvv = txtCVV.getText().trim();
+        if (reservaPendente != null) {
+            reservaPendente.setStatus("Confirmada");
+            if (rbCartaoSalvo.isSelected())
+                reservaPendente.setMetodoPagamento("Cartão Salvo");
+            else if (rbPix.isSelected())
+                reservaPendente.setMetodoPagamento("Pix");
+            else if (rbNovoCartao.isSelected())
+                reservaPendente.setMetodoPagamento("Novo Cartão");
+            else if (rbBoleto.isSelected())
+                reservaPendente.setMetodoPagamento("Boleto");
+        }
 
-                if (nome.isEmpty() || numero.isEmpty() || validade.isEmpty() || cvv.isEmpty()) {
-                    JOptionPane.showMessageDialog(TelaPagamento.this, "Preencha todos os dados do cartão!", "Erro",
-                            JOptionPane.WARNING_MESSAGE);
-                    return;
-                }
-            }
+        JOptionPane.showMessageDialog(this, "Pagamento confirmado com sucesso!", "Sucesso",
+                JOptionPane.INFORMATION_MESSAGE);
 
-            if (reservaPendente != null) {
-                reservaPendente.setStatus("Confirmada");
-                if (rbCredito.isSelected())
-                    reservaPendente.setMetodoPagamento("Cartão de Crédito");
-                else if (rbDebito.isSelected())
-                    reservaPendente.setMetodoPagamento("Cartão de Débito");
-                else if (rbPontos.isSelected())
-                    reservaPendente.setMetodoPagamento("Pontos");
-                else if (rbPix.isSelected())
-                    reservaPendente.setMetodoPagamento("PIX");
-            }
+        JFrame frameReservas = new JFrame("Minhas Reservas");
+        frameReservas.setSize(1000, 700);
+        frameReservas.setLocationRelativeTo(null);
+        frameReservas.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frameReservas.add(new tela_reserva(null));
+        frameReservas.setVisible(true);
 
-            JOptionPane.showMessageDialog(TelaPagamento.this, "Pagamento confirmado com sucesso!", "Sucesso",
-                    JOptionPane.INFORMATION_MESSAGE);
-
-            JFrame frameReservas = new JFrame("Minhas Reservas");
-            frameReservas.setSize(1000, 700);
-            frameReservas.setLocationRelativeTo(null);
-            frameReservas.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frameReservas.add(new tela_reserva(null));
-            frameReservas.setVisible(true);
-
-            dispose();
-        });
+        dispose();
     }
 
     public static void main(String[] args) {
