@@ -2,9 +2,6 @@
 
 Este projeto é um trabalho acadêmico desenvolvido para a disciplina de **Linguagens de Programação 2**. O objetivo é aplicar conceitos de Programação Orientada a Objetos (POO), design de interfaces gráficas (GUI) e arquitetura de software na construção de uma aplicação desktop funcional.
 
-> **[INSERIR IMAGEM AQUI]**
-> **Tela:** Logo do projeto (o arquivo `../logo.png`)
-> **Funcionalidade:** Identidade visual da aplicação.
 
 ---
 
@@ -23,10 +20,6 @@ O sistema atende aos principais requisitos funcionais (RF) de um sistema de e-co
 ### Autenticação de Usuário (RF03, RF04)
 Telas de `tela_login` e `tela_cadastro` totalmente funcionais. O nome do usuário é persistido estaticamente na classe `SessaoUsuario` após o login e é corretamente exibido na tela de reservas.
 
-> **[INSERIR IMAGEM AQUI]**
-> **Tela:** `tela_login` ou uma composição de `tela_login` e `tela_cadastro`.
-> **Funcionalidade:** Demonstração das telas de autenticação e registro.
-
 ### Busca de Voos (RF01, RF02)
 A `TelaInicial` permite a busca por origem e destino. O sistema valida buscas com a mesma cidade (RF01) e exibe resultados gerados aleatoriamente em `TelaResultadosBusca`.
 
@@ -44,16 +37,10 @@ Na tela de resultados, o usuário tem duas opções: "Selecionar Voo" (leva ao `
 ### Gerenciamento de Reservas (RF09, RF10)
 A `tela_reserva` lista todos os voos (mockados e recém-adicionados). O usuário pode clicar para ver detalhes (`tela_detalhes_reserva`) ou remover uma reserva.
 
-> **[INSERIR IMAGEM AQUI]**
-> **Tela:** `tela_reserva`
-> **Funcionalidade:** Lista de reservas do usuário, mostrando o nome (obtido da `SessaoUsuario`) e a tabela de voos.
 
 ### Detalhes e Emissão de Comprovante (RF08, RF10)
 A tela de detalhes permite ao usuário editar dados (Nome, Documento), remover a reserva ou simular a geração de um comprovante em PDF.
 
-> **[INSERIR IMAGEM AQUI]**
-> **Tela:** `tela_detalhes_reserva`
-> **Funcionalidade:** Exibição dos detalhes completos do voo e os botões de ação (Alterar, Remover, Gerar Comprovante).
 
 ---
 
