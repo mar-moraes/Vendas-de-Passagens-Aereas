@@ -66,13 +66,3 @@ Para que este projeto se tornasse escalável, o próximo passo seria refatorá-l
 
 ---
 
-##  Pontos de Melhoria
-
-Embora o projeto seja funcional para seus objetivos acadêmicos, existem diversos pontos para melhoria e evolução:
-
-1.  **Banco de Dados Real:** Substituir a classe `DadosReservas` por uma conexão JDBC a um SGBD (MySQL, PostgreSQL, etc.) para persistência real dos dados.
-2.  **Autenticação Real:** Implementar um sistema de login que valide as credenciais com o banco de dados e utilize criptografia (hashing) para as senhas (RNF03).
-3.  **Validação de Campos:** Melhorar a validação dos formulários de cadastro e busca (ex: usar regex para e-mail, impedir buscas em datas passadas).
-4.  **Componentes Avançados (IHC):** Substituir o campo de data (`JFormattedTextField`) por um componente de calendário (`JDatePicker`) para melhorar a usabilidade.
-5.  **Implementação de Requisitos Faltantes:** Adicionar as funcionalidades descritas no documento de requisitos que não foram implementadas, como a seleção de **número de passageiros** (RF01) e o método de pagamento via **PIX** (RF07).
-6.  **Tratamento de Erros:** Melhorar o tratamento de exceções (ex: falhas de conexão com o "banco", formatos de data inválidos) para fornecer feedback mais claro ao usuário.
